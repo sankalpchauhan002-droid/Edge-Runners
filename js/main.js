@@ -63,8 +63,32 @@ function init() {
     // UI Controls Setup
     const btnPause = document.getElementById('btn-pause');
     const btnMusic = document.getElementById('btn-music');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
     let isMusicMuted = true;
     let musicStarted = false;
+
+    if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', () => {
+            const docEl = document.documentElement;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (docEl.requestFullscreen) {
+                    docEl.requestFullscreen().catch(e => console.warn(e));
+                } else if (docEl.webkitRequestFullscreen) {
+                    docEl.webkitRequestFullscreen().catch(e => console.warn(e));
+                } else if (docEl.msRequestFullscreen) {
+                    docEl.msRequestFullscreen().catch(e => console.warn(e));
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        });
+    }
     
     btnPause.addEventListener('click', () => {
         if (!game) return;
