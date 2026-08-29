@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Player } from './Player.js?v=9';
-import { TrackManager } from './TrackManager.js?v=7';
+import { Player } from './Player.js?v=10';
+import { TrackManager } from './TrackManager.js?v=8';
 import { InputManager } from './InputManager.js?v=2';
 import { SoundManager } from './SoundManager.js?v=8';
 
@@ -184,7 +184,12 @@ export class Game {
         // Add loading progress indicator
         THREE.DefaultLoadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
             const percent = Math.round((itemsLoaded / itemsTotal) * 100);
-            this.uiLoading.innerHTML = `<h1>Loading Assets...</h1><p style="font-size:24px; color:#00ffff; text-shadow: 0 0 10px #00ffff; font-family:'Orbitron', sans-serif;">${percent}% (${itemsLoaded}/${itemsTotal})</p><p style="font-size:12px; color:#aaa; margin-top:20px;">Downloading ~80MB of 3D models over the tunnel, this may take a minute...</p>`;
+            const fill = document.getElementById('loading-bar-fill');
+            const text = document.getElementById('loading-text');
+            if (fill && text) {
+                fill.style.width = percent + '%';
+                text.innerText = `INITIALIZING... ${percent}%`;
+            }
         };
         this.uiPowerupContainer = document.getElementById('powerup-container');
         this.uiPowerupName = document.getElementById('powerup-name');

@@ -28,9 +28,11 @@ export class TrackManager {
         const updateProgress = (xhr) => {
             if (xhr.lengthComputable) {
                 const percent = Math.round((xhr.loaded / xhr.total) * 100);
-                const loadingEl = document.getElementById('loading');
-                if (loadingEl) {
-                    loadingEl.innerHTML = `<h1>Loading Assets...</h1><p style="font-size:24px; color:#00ffff; text-shadow: 0 0 10px #00ffff; font-family:'Orbitron', sans-serif;">Downloading model... ${percent}%</p><p style="font-size:12px; color:#aaa; margin-top:20px;">Downloading ~80MB of 3D models over the tunnel, this may take a minute...</p>`;
+                const fill = document.getElementById('loading-bar-fill');
+                const text = document.getElementById('loading-text');
+                if (fill && text) {
+                    fill.style.width = percent + '%';
+                    text.innerText = `DOWNLOADING ASSETS... ${percent}%`;
                 }
             }
         };
