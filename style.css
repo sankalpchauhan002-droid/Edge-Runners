@@ -308,3 +308,87 @@ button:active {
     color: #00f2fe;
     text-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    #start-screen h1 {
+        font-size: 40px;
+        letter-spacing: 5px;
+    }
+    #start-screen p {
+        font-size: 16px;
+    }
+    .char-select-btn {
+        padding: 10px 20px !important;
+        font-size: 16px !important;
+    }
+    
+    #score-container {
+        top: 10px;
+        left: 10px;
+        min-width: 150px;
+    }
+    .hud-value {
+        font-size: 20px;
+    }
+    
+    #controls-container {
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+        gap: 5px;
+    }
+    .icon-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    #store-container {
+        top: 70px !important;
+        right: 10px !important;
+    }
+    #store-container button {
+        font-size: 11px !important;
+        padding: 5px 8px !important;
+    }
+    
+    #powerup-container {
+        top: 80px !important;
+        left: 10px !important;
+        min-width: 150px !important;
+        padding: 10px !important;
+    }
+    #powerup-name {
+        font-size: 1em !important;
+    }
+    #powerup-desc {
+        font-size: 0.65em !important;
+    }
+
+    .neon-title {
+        font-size: 40px;
+    }
+    .stats-grid {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    .stat-box {
+        padding: 15px;
+        min-width: 200px;
+    }
+    .stat-box h2 {
+        font-size: 32px;
+    }
+    
+    #game-over h1, #loading h1 {
+        font-size: 40px;
+    }
+    #game-over p {
+        font-size: 20px;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 18px;
+    }
+}

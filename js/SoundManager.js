@@ -101,21 +101,28 @@ export class SoundManager {
 
     playCoin() {
         if (!this.enabled || !this.ctx) return;
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        
+        const nowTime = performance.now();
+        if (this.lastCoinTime && nowTime - this.lastCoinTime < 50) return; // Debounce fast collections
+        this.lastCoinTime = nowTime;
+
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         
+        const now = this.ctx.currentTime + 0.01; // Avoid scheduling in the past
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(987.77, this.ctx.currentTime); // B5
-        osc.frequency.setValueAtTime(1318.51, this.ctx.currentTime + 0.05); // E6
+        osc.frequency.setValueAtTime(987.77, now); // B5
+        osc.frequency.setValueAtTime(1318.51, now + 0.05); // E6
         
-        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
         
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
     }
 
     playHit() {

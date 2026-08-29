@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { Player } from './Player.js?v=7';
-import { TrackManager } from './TrackManager.js?v=5';
-import { InputManager } from './InputManager.js';
-import { SoundManager } from './SoundManager.js?v=7';
+import { Player } from './Player.js?v=9';
+import { TrackManager } from './TrackManager.js?v=7';
+import { InputManager } from './InputManager.js?v=2';
+import { SoundManager } from './SoundManager.js?v=8';
 
 class ParticleManager {
     constructor(scene) {
@@ -180,6 +180,12 @@ export class Game {
         this.uiFinalScore = document.getElementById('final-score');
         this.uiLoading = document.getElementById('loading');
         this.uiStartScreen = document.getElementById('start-screen');
+        
+        // Add loading progress indicator
+        THREE.DefaultLoadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+            const percent = Math.round((itemsLoaded / itemsTotal) * 100);
+            this.uiLoading.innerHTML = `<h1>Loading Assets...</h1><p style="font-size:24px; color:#00ffff; text-shadow: 0 0 10px #00ffff; font-family:'Orbitron', sans-serif;">${percent}% (${itemsLoaded}/${itemsTotal})</p><p style="font-size:12px; color:#aaa; margin-top:20px;">Downloading ~80MB of 3D models over the tunnel, this may take a minute...</p>`;
+        };
         this.uiPowerupContainer = document.getElementById('powerup-container');
         this.uiPowerupName = document.getElementById('powerup-name');
         this.uiPowerupDesc = document.getElementById('powerup-desc');
@@ -259,10 +265,8 @@ export class Game {
 
     async loadAssets() {
         try {
-            await Promise.all([
-                this.player.loadModel(),
-                this.trackManager.loadModel()
-            ]);
+            await this.player.loadModel();
+            await this.trackManager.loadModel();
             
             // Pre-load char1 so the cinematic camera has something to orbit!
             this.player.selectCharacter('char1');
@@ -283,6 +287,16 @@ export class Game {
     }
 
     startGameplay() {
+        // Request Fullscreen
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) {
+            docEl.requestFullscreen().catch(e => console.warn("Fullscreen error:", e));
+        } else if (docEl.webkitRequestFullscreen) { // Safari
+            docEl.webkitRequestFullscreen().catch(e => console.warn("Fullscreen error:", e));
+        } else if (docEl.msRequestFullscreen) { // IE11
+            docEl.msRequestFullscreen().catch(e => console.warn("Fullscreen error:", e));
+        }
+
         this.uiStartScreen.style.display = 'none';
         
         // Show HUD
@@ -330,12 +344,8 @@ export class Game {
         
         // Restart music from the very beginning
         if (window.ytPlayer && typeof window.ytPlayer.seekTo === 'function') {
-            window.ytPlayer.seekTo(0);
-            // If we're restarting and the game was unmuted, play it
-            const btnMusic = document.getElementById('btn-music');
-            if (btnMusic && !btnMusic.innerText.toUpperCase().includes('UNMUTE')) {
-                window.ytPlayer.playVideo();
-            }
+            window.ytPlayer.seekTo(0, true);
+            window.ytPlayer.playVideo();
         }
     }
 

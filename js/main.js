@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { Game } from './Game.js?v=16';
+import { Game } from './Game.js?v=20';
 
 let game;
 
@@ -147,6 +147,9 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     
     renderer.setSize(window.innerWidth, window.innerHeight);
+    if (game.composer) {
+        game.composer.setSize(window.innerWidth, window.innerHeight);
+    }
 }
 
 // Ensure the DOM is fully loaded before init

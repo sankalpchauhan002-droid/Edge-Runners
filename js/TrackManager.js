@@ -25,19 +25,28 @@ export class TrackManager {
 
     async loadModel() {
         const loader = new GLTFLoader();
-        
-        const loadGLTF = (path) => new Promise((resolve, reject) => {
-            loader.load(path, resolve, undefined, reject);
-        });
+        const updateProgress = (xhr) => {
+            if (xhr.lengthComputable) {
+                const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                const loadingEl = document.getElementById('loading');
+                if (loadingEl) {
+                    loadingEl.innerHTML = `<h1>Loading Assets...</h1><p style="font-size:24px; color:#00ffff; text-shadow: 0 0 10px #00ffff; font-family:'Orbitron', sans-serif;">Downloading model... ${percent}%</p><p style="font-size:12px; color:#aaa; margin-top:20px;">Downloading ~80MB of 3D models over the tunnel, this may take a minute...</p>`;
+                }
+            }
+        };
+
+        const loadGLTF = (path) => {
+            return new Promise((resolve, reject) => {
+                loader.load(path, resolve, updateProgress, reject);
+            });
+        };// Load all models concurrently
 
         try {
             // Load all models concurrently
-            const [cityGltf, policeGltf, raceGltf, sportsGltf] = await Promise.all([
-                loadGLTF('./assets/beautiful-city/source/Untitled.glb'),
-                loadGLTF('./assets/PoliceCar.glb'),
-                loadGLTF('./assets/RaceCar.glb'),
-                loadGLTF('./assets/SportsCar.glb')
-            ]);
+            const cityGltf = await loadGLTF('./assets/beautiful-city/source/Untitled.glb');
+            const policeGltf = await loadGLTF('./assets/PoliceCar.glb');
+            const raceGltf = await loadGLTF('./assets/RaceCar.glb');
+            const sportsGltf = await loadGLTF('./assets/SportsCar.glb');
 
             this.vehicleModels = {
                 police: policeGltf.scene,

@@ -40,25 +40,33 @@ export class Player {
             const loader = new GLTFLoader();
             const fbxLoader = new FBXLoader();
             
+            const updateProgress = (xhr) => {
+                if (xhr.lengthComputable) {
+                    const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                    const loadingEl = document.getElementById('loading');
+                    if (loadingEl) {
+                        loadingEl.innerHTML = `<h1>Loading Assets...</h1><p style="font-size:24px; color:#00ffff; text-shadow: 0 0 10px #00ffff; font-family:'Orbitron', sans-serif;">Downloading model... ${percent}%</p><p style="font-size:12px; color:#aaa; margin-top:20px;">Downloading ~80MB of 3D models over the tunnel, this may take a minute...</p>`;
+                    }
+                }
+            };
+
             const loadGLTF = (url) => {
                 return new Promise((resolve, reject) => {
-                    loader.load(url, resolve, undefined, reject);
+                    loader.load(url, resolve, updateProgress, reject);
                 });
             };
 
             const loadFBX = (url) => {
                 return new Promise((resolve, reject) => {
-                    fbxLoader.load(url, resolve, undefined, reject);
+                    fbxLoader.load(url, resolve, updateProgress, reject);
                 });
             };
 
-            const [gltf1, gltf2, gltf3, gltf4, skatesFbx] = await Promise.all([
-                loadGLTF('./assets/anime-girl-character/source/AnimeCharacter.glb'),
-                loadGLTF('./assets/rigged-anime-male-character-1/source/rigged.glb'),
-                loadGLTF('./assets/robot/source/RobotExpressive.glb'),
-                loadGLTF('./assets/soldier/source/Soldier.glb'),
-                loadFBX('./assets/classic-roller-skates/source/classic_roller_skates_01.fbx')
-            ]);
+            const gltf1 = await loadGLTF('./assets/anime-girl-character/source/AnimeCharacter.glb');
+            const gltf2 = await loadGLTF('./assets/rigged-anime-male-character-1/source/rigged.glb');
+            const gltf3 = await loadGLTF('./assets/robot/source/RobotExpressive.glb');
+            const gltf4 = await loadGLTF('./assets/soldier/source/Soldier.glb');
+            const skatesFbx = await loadFBX('./assets/classic-roller-skates/source/classic_roller_skates_01.fbx');
             
             this.models['char1'] = gltf1;
             this.models['char2'] = gltf2;
