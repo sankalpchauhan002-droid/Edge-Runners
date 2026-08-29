@@ -456,7 +456,7 @@ export class Game {
         
         if (this.uiPowerupContainer) {
             this.uiPowerupContainer.style.display = 'flex';
-            this.uiPowerupName.innerText = type + ' ACTIVE';
+            this.uiPowerupName.innerText = type;
             
             let color = '#00ffff';
             let desc = '';
