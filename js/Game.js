@@ -182,13 +182,31 @@ export class Game {
         this.uiStartScreen = document.getElementById('start-screen');
         
         // Add loading progress indicator
+        const funnyMessages = [
+            "ESTABLISHING NEURAL LINK...",
+            "CALIBRATING KINETIC DAMPENERS...",
+            "LOADING SECTOR HAZARD DATA...",
+            "INITIALIZING RTX SHADERS...",
+            "SYNCING BIOMETRIC SENSORS...",
+            "ACCESSING BLACK MARKET NETWORK...",
+            "PREPARING DROP SEQUENCE..."
+        ];
+        
         THREE.DefaultLoadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
             const percent = Math.round((itemsLoaded / itemsTotal) * 100);
             const fill = document.getElementById('loading-bar-fill');
             const text = document.getElementById('loading-text');
+            const msg = document.getElementById('loading-msg');
+            
             if (fill && text) {
                 fill.style.width = percent + '%';
-                text.innerText = `INITIALIZING... ${percent}%`;
+                text.innerText = `${percent}%`;
+            }
+            if (msg) {
+                let msgIndex = Math.floor((itemsLoaded / itemsTotal) * (funnyMessages.length - 1));
+                // Cap the index to prevent out of bounds if itemsLoaded > itemsTotal somehow
+                msgIndex = Math.min(Math.max(0, msgIndex), funnyMessages.length - 1);
+                msg.innerText = funnyMessages[msgIndex];
             }
         };
         this.uiPowerupContainer = document.getElementById('powerup-container');
@@ -199,6 +217,8 @@ export class Game {
         this.uiStoreContainer = document.getElementById('store-container');
         
         document.getElementById('restart-btn').addEventListener('click', () => this.restart());
+        document.getElementById('menu-btn').addEventListener('click', () => this.returnToMenu());
+        
         document.getElementById('char1-btn').addEventListener('click', () => {
             this.player.selectCharacter('char1');
             this.startGameplay();
@@ -373,6 +393,44 @@ export class Game {
         this.player.playStumble();
         
         // Stop music
+        if (window.ytPlayer && typeof window.ytPlayer.pauseVideo === 'function') {
+            window.ytPlayer.pauseVideo();
+        }
+    }
+
+    returnToMenu() {
+        this.reset();
+        
+        this.isGameOver = false;
+        this.isRunning = false;
+        this.hasStarted = false;
+        this.isPaused = false;
+        
+        // Hide game UI
+        document.getElementById('controls-container').style.display = 'none';
+        document.getElementById('score-container').style.display = 'none';
+        if (this.uiStoreContainer) this.uiStoreContainer.style.display = 'none';
+        if (this.uiPowerupContainer) this.uiPowerupContainer.style.display = 'none';
+        this.uiGameOver.style.display = 'none';
+        document.getElementById('pause-screen').style.display = 'none';
+        
+        // Show start screen
+        this.uiStartScreen.style.display = 'flex';
+        
+        // Re-center cinematic camera
+        this.camera.position.set(0, 5, -10);
+        this.camera.lookAt(0, 1.5, 0);
+        
+        // Exit Fullscreen if active
+        const doc = window.document;
+        if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
+            if (doc.exitFullscreen) doc.exitFullscreen().catch(e => console.warn(e));
+            else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen();
+            else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
+            else if (doc.msExitFullscreen) doc.msExitFullscreen();
+        }
+        
+        // Pause music
         if (window.ytPlayer && typeof window.ytPlayer.pauseVideo === 'function') {
             window.ytPlayer.pauseVideo();
         }
