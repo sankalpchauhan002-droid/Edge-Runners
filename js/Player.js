@@ -41,15 +41,7 @@ export class Player {
             const fbxLoader = new FBXLoader();
             
             const updateProgress = (xhr) => {
-                if (xhr.lengthComputable) {
-                    const percent = Math.round((xhr.loaded / xhr.total) * 100);
-                    const fill = document.getElementById('loading-bar-fill');
-                    const text = document.getElementById('loading-text');
-                    if (fill && text) {
-                        fill.style.width = percent + '%';
-                        text.innerText = `DOWNLOADING ASSETS... ${percent}%`;
-                    }
-                }
+                // Rely on THREE.DefaultLoadingManager for UI progress
             };
 
             const loadGLTF = (url) => {
@@ -64,11 +56,13 @@ export class Player {
                 });
             };
 
-            const gltf1 = await loadGLTF('./assets/anime-girl-character/source/AnimeCharacter.glb');
-            const gltf2 = await loadGLTF('./assets/rigged-anime-male-character-1/source/rigged.glb');
-            const gltf3 = await loadGLTF('./assets/robot/source/RobotExpressive.glb');
-            const gltf4 = await loadGLTF('./assets/soldier/source/Soldier.glb');
-            const skatesFbx = await loadFBX('./assets/classic-roller-skates/source/classic_roller_skates_01.fbx');
+            const [gltf1, gltf2, gltf3, gltf4, skatesFbx] = await Promise.all([
+                loadGLTF('./assets/anime-girl-character/source/AnimeCharacter.glb'),
+                loadGLTF('./assets/rigged-anime-male-character-1/source/rigged.glb'),
+                loadGLTF('./assets/robot/source/RobotExpressive.glb'),
+                loadGLTF('./assets/soldier/source/Soldier.glb'),
+                loadFBX('./assets/classic-roller-skates/source/classic_roller_skates_01.fbx')
+            ]);
             
             this.models['char1'] = gltf1;
             this.models['char2'] = gltf2;

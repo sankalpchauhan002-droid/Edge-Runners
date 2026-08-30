@@ -290,8 +290,10 @@ export class Game {
 
     async loadAssets() {
         try {
-            await this.player.loadModel();
-            await this.trackManager.loadModel();
+            await Promise.all([
+                this.player.loadModel(),
+                this.trackManager.loadModel()
+            ]);
             
             // Pre-load char1 so the cinematic camera has something to orbit!
             this.player.selectCharacter('char1');

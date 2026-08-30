@@ -26,15 +26,7 @@ export class TrackManager {
     async loadModel() {
         const loader = new GLTFLoader();
         const updateProgress = (xhr) => {
-            if (xhr.lengthComputable) {
-                const percent = Math.round((xhr.loaded / xhr.total) * 100);
-                const fill = document.getElementById('loading-bar-fill');
-                const text = document.getElementById('loading-text');
-                if (fill && text) {
-                    fill.style.width = percent + '%';
-                    text.innerText = `DOWNLOADING ASSETS... ${percent}%`;
-                }
-            }
+            // Rely on THREE.DefaultLoadingManager for UI progress
         };
 
         const loadGLTF = (path) => {
@@ -45,10 +37,12 @@ export class TrackManager {
 
         try {
             // Load all models concurrently
-            const cityGltf = await loadGLTF('./assets/beautiful-city/source/Untitled.glb');
-            const policeGltf = await loadGLTF('./assets/PoliceCar.glb');
-            const raceGltf = await loadGLTF('./assets/RaceCar.glb');
-            const sportsGltf = await loadGLTF('./assets/SportsCar.glb');
+            const [cityGltf, policeGltf, raceGltf, sportsGltf] = await Promise.all([
+                loadGLTF('./assets/beautiful-city/source/Untitled.glb'),
+                loadGLTF('./assets/PoliceCar.glb'),
+                loadGLTF('./assets/RaceCar.glb'),
+                loadGLTF('./assets/SportsCar.glb')
+            ]);
 
             this.vehicleModels = {
                 police: policeGltf.scene,
