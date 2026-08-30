@@ -93,8 +93,14 @@ function init() {
         });
     }
 
-    // Global UI Renderer to avoid Too Many WebGL Contexts crash on Mobile
-    const sharedUIRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    // Global UI Renderers to avoid Too Many WebGL Contexts crash and prevent buffer reallocation lag
+    const sharedCharRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    sharedCharRenderer.setPixelRatio(window.devicePixelRatio || 1);
+    sharedCharRenderer.setSize(120, 160, false);
+
+    const sharedIconRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    sharedIconRenderer.setPixelRatio(window.devicePixelRatio || 1);
+    sharedIconRenderer.setSize(60, 60, false);
 
     // Render Character Previews for Start Screen
     let charButtonsRendered = false;
@@ -186,16 +192,15 @@ function init() {
             const clock = new THREE.Clock();
             const animateChar = () => {
                 requestAnimationFrame(animateChar);
+                if (canvas.offsetParent === null) return;
                 const delta = clock.getDelta();
                 if (modelGroup.userData.mixer) {
                     modelGroup.userData.mixer.update(delta);
                 }
                 // User requested front-facing and non-rotating
-                sharedUIRenderer.setSize(120, 160, false);
-                sharedUIRenderer.setPixelRatio(window.devicePixelRatio || 1);
-                sharedUIRenderer.render(scene, camera);
+                sharedCharRenderer.render(scene, camera);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(sharedUIRenderer.domElement, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(sharedCharRenderer.domElement, 0, 0, canvas.width, canvas.height);
             };
             animateChar();
         });
@@ -345,6 +350,7 @@ function init() {
             
             const animateIcon = () => {
                 requestAnimationFrame(animateIcon);
+                if (canvas.offsetParent === null) return;
                 // Obstacles look better rotating slowly
                 if (['cone', 'barricade', 'scaffold', 'boom', 'vehicle'].includes(type)) {
                     model.rotation.y += 0.01;
@@ -354,11 +360,9 @@ function init() {
                     model.rotation.y += 0.02;
                     model.rotation.x += 0.01;
                 }
-                sharedUIRenderer.setSize(60, 60, false);
-                sharedUIRenderer.setPixelRatio(window.devicePixelRatio || 1);
-                sharedUIRenderer.render(scene, camera);
+                sharedIconRenderer.render(scene, camera);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(sharedUIRenderer.domElement, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(sharedIconRenderer.domElement, 0, 0, canvas.width, canvas.height);
             };
             animateIcon();
         });
