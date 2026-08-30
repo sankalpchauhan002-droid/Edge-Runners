@@ -93,6 +93,9 @@ function init() {
         });
     }
 
+    // Global UI Renderer to avoid Too Many WebGL Contexts crash on Mobile
+    const sharedUIRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
     // Render Character Previews for Start Screen
     let charButtonsRendered = false;
     const renderCharButtons = () => {
@@ -105,9 +108,12 @@ function init() {
         charButtonsRendered = true;
         const canvases = document.querySelectorAll('.char-canvas');
         canvases.forEach(canvas => {
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setSize(120, 160);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            const dpr = window.devicePixelRatio || 1;
+            canvas.style.width = '120px';
+            canvas.style.height = '160px';
+            canvas.width = 120 * dpr;
+            canvas.height = 160 * dpr;
+            const ctx = canvas.getContext('2d');
             
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(50, 120/160, 0.1, 100);
@@ -185,7 +191,11 @@ function init() {
                     modelGroup.userData.mixer.update(delta);
                 }
                 // User requested front-facing and non-rotating
-                renderer.render(scene, camera);
+                sharedUIRenderer.setSize(120, 160, false);
+                sharedUIRenderer.setPixelRatio(window.devicePixelRatio || 1);
+                sharedUIRenderer.render(scene, camera);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(sharedUIRenderer.domElement, 0, 0, canvas.width, canvas.height);
             };
             animateChar();
         });
@@ -199,9 +209,12 @@ function init() {
             if(canvas.dataset.rendered) return; // Only init once
             canvas.dataset.rendered = "true";
             
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setSize(60, 60);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            const dpr = window.devicePixelRatio || 1;
+            canvas.style.width = '60px';
+            canvas.style.height = '60px';
+            canvas.width = 60 * dpr;
+            canvas.height = 60 * dpr;
+            const ctx = canvas.getContext('2d');
             
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 10);
@@ -341,7 +354,11 @@ function init() {
                     model.rotation.y += 0.02;
                     model.rotation.x += 0.01;
                 }
-                renderer.render(scene, camera);
+                sharedUIRenderer.setSize(60, 60, false);
+                sharedUIRenderer.setPixelRatio(window.devicePixelRatio || 1);
+                sharedUIRenderer.render(scene, camera);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(sharedUIRenderer.domElement, 0, 0, canvas.width, canvas.height);
             };
             animateIcon();
         });
